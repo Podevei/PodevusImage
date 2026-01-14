@@ -146,7 +146,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ===== 加载遮罩 ===== */
+        /* ===== 高级加载遮罩系统 ===== */
         .loader-mask {
             position: fixed;
             top: 0;
@@ -162,53 +162,453 @@
             transition: opacity 0.6s ease;
         }
 
-        .loader-gear-container {
-            width: 80px;
-            height: 80px;
+        /* 机械齿轮加载器 */
+        .mechanical-loader {
             position: relative;
+            width: 200px;
+            height: 200px;
         }
 
-        .loader-gear-svg {
+        .loader-gear-main {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            animation: rotateGear 4s linear infinite;
+        }
+
+        .loader-gear-main path {
+            fill: none;
+            stroke: var(--accent-copper);
+            stroke-width: 2;
+        }
+
+        .loader-gear-orbit {
+            position: absolute;
+            animation: rotateGear 6s linear infinite reverse;
+        }
+
+        .loader-gear-orbit path {
+            fill: none;
+            stroke: var(--accent-gold);
+            stroke-width: 1.5;
+        }
+
+        .orbit-1 {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+        }
+
+        .orbit-2 {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+        }
+
+        .orbit-3 {
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+        }
+
+        .orbit-4 {
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+        }
+
+        .loader-particles {
+            position: absolute;
             width: 100%;
             height: 100%;
-            animation: rotateGear 3s linear infinite;
         }
 
-        .loader-gear-svg path {
-            fill: var(--accent-copper);
+        .loader-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            animation: particleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
         }
 
         .loader-text {
-            margin-top: 25px;
+            margin-top: 50px;
             font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
-            letter-spacing: 0.4em;
+            font-size: 0.75rem;
+            letter-spacing: 0.5em;
             color: var(--text-muted);
             text-transform: uppercase;
-        }
-
-        .loader-progress {
-            width: 180px;
-            height: 1px;
-            background: var(--border-ornate);
-            margin-top: 18px;
             position: relative;
-            overflow: hidden;
         }
 
-        .loader-progress-bar {
+        .loader-text::after {
+            content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent-gold), var(--accent-copper));
-            transition: width 0.3s ease;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 1px;
+            background: var(--accent-gold);
+            animation: lineExpand 2s ease-in-out infinite;
+        }
+
+        @keyframes lineExpand {
+            0%, 100% { width: 0; }
+            50% { width: 120px; }
+        }
+
+        .loader-percentage {
+            margin-top: 35px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--accent-copper);
+            letter-spacing: 0.2em;
         }
 
         @keyframes rotateGear {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ===== 超级高级退出过渡系统 ===== */
+        .exit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        /* 六边形网格层 */
+        .hex-grid-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hex-cell {
+            position: absolute;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: var(--accent-copper);
+            transform-origin: center;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 齿轮爆发层 */
+        .gear-burst-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .burst-gear {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .burst-gear svg {
+            fill: none;
+            stroke: var(--accent-gold);
+            stroke-width: 1.5;
+        }
+
+        /* 粒子爆炸层 */
+        .particle-explosion-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .explosion-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 波纹扩散层 */
+        .ripple-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .ripple-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid var(--accent-copper);
+            border-radius: 50%;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 扫描线层 */
+        .scanline-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .scanline {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--accent-gold) 50%, 
+                transparent 100%);
+            top: -2px;
+            box-shadow: 0 0 20px var(--accent-gold);
+        }
+
+        /* 分形裂纹层 */
+        .fractal-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .fractal-line {
+            position: absolute;
+            background: var(--accent-copper);
+            transform-origin: left center;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 光束聚焦层 */
+        .light-beam-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .light-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 0;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                var(--accent-gold) 50%, 
+                transparent 100%);
+            transform-origin: center;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px var(--accent-gold);
+        }
+
+        /* 最终白幕层 */
+        .final-fade-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        /* 退出动画激活状态 */
+        .exit-overlay.active .hex-grid-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .hex-cell {
+            transform: scale(1.2);
+            opacity: 0;
+        }
+
+        .exit-overlay.active .gear-burst-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .burst-gear {
+            transform: translate(-50%, -50%) scale(3) rotate(360deg);
+            opacity: 0;
+        }
+
+        .exit-overlay.active .particle-explosion-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .ripple-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .ripple-circle {
+            width: 2000px;
+            height: 2000px;
+            opacity: 0;
+        }
+
+        .exit-overlay.active .scanline-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .fractal-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .light-beam-layer {
+            opacity: 1;
+        }
+
+        .exit-overlay.active .light-beam {
+            height: 2000px;
+        }
+
+        .exit-overlay.active .final-fade-layer {
+            opacity: 1;
+        }
+
+        /* ===== 加载效果2 - 万花筒齿轮矩阵 ===== */
+        .loading-effect-2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 10002;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .loading-effect-2.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .kaleidoscope-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vmin;
+            height: 80vmin;
+        }
+
+        .kaleidoscope-gear {
+            position: absolute;
+            width: 26.66%;
+            height: 26.66%;
+        }
+
+        .kaleidoscope-gear svg path {
+            fill: none;
+            stroke: var(--accent-copper);
+            stroke-width: 2;
+        }
+
+        @keyframes kaleidoSpin1 {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        @keyframes kaleidoSpin2 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+
+        @keyframes kaleidoPulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* 中心光晕 */
+        .kaleidoscope-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: centerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes centerPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+        }
+
+        /* 环绕粒子 */
+        .orbit-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--accent-gold);
+        }
+
+        @keyframes orbitRotate {
+            from { transform: rotate(0deg) translateX(200px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
         }
 
         /* ===== 主容器 ===== */
@@ -690,23 +1090,6 @@
             transform: rotate(45deg);
         }
 
-        /* ===== 退出动画 ===== */
-        .exit-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-primary);
-            z-index: 9998;
-            transform: translateY(100%);
-            transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
-        }
-
-        .exit-overlay.active {
-            transform: translateY(0);
-        }
-
         /* ===== 动态光晕 ===== */
         .ambient-glow {
             position: fixed;
@@ -788,16 +1171,52 @@
     <div class="ambient-glow"></div>
 
     <div class="loader-mask">
-        <div class="loader-gear-container">
-            <svg class="loader-gear-svg" id="loader-gear" viewBox="0 0 100 100"></svg>
+        <div class="mechanical-loader">
+            <svg class="loader-gear-main" id="loader-gear-main" viewBox="-50 -50 100 100"></svg>
+            <svg class="loader-gear-orbit orbit-1" id="orbit-1" viewBox="-50 -50 100 100"></svg>
+            <svg class="loader-gear-orbit orbit-2" id="orbit-2" viewBox="-50 -50 100 100"></svg>
+            <svg class="loader-gear-orbit orbit-3" id="orbit-3" viewBox="-50 -50 100 100"></svg>
+            <svg class="loader-gear-orbit orbit-4" id="orbit-4" viewBox="-50 -50 100 100"></svg>
+            <div class="loader-particles" id="loader-particles"></div>
         </div>
-        <div class="loader-text">Loading</div>
-        <div class="loader-progress">
-            <div class="loader-progress-bar"></div>
-        </div>
+        <div class="loader-text">INITIALIZING</div>
+        <div class="loader-percentage" id="loader-percentage">0%</div>
     </div>
 
-    <div class="exit-overlay"></div>
+    <div class="exit-overlay">
+        <!-- 六边形网格层 -->
+        <div class="hex-grid-layer" id="hex-grid-layer"></div>
+        
+        <!-- 齿轮爆发层 -->
+        <div class="gear-burst-layer" id="gear-burst-layer"></div>
+        
+        <!-- 粒子爆炸层 -->
+        <div class="particle-explosion-layer" id="particle-explosion-layer"></div>
+        
+        <!-- 波纹扩散层 -->
+        <div class="ripple-layer" id="ripple-layer"></div>
+        
+        <!-- 扫描线层 -->
+        <div class="scanline-layer">
+            <div class="scanline" id="scanline"></div>
+        </div>
+        
+        <!-- 分形裂纹层 -->
+        <div class="fractal-layer" id="fractal-layer"></div>
+        
+        <!-- 光束聚焦层 -->
+        <div class="light-beam-layer" id="light-beam-layer"></div>
+        
+        <!-- 最终白幕层 -->
+        <div class="final-fade-layer"></div>
+    </div>
+
+    <!-- 加载效果2 - 万花筒齿轮矩阵 -->
+    <div class="loading-effect-2" id="loading-effect-2">
+        <div class="kaleidoscope-container" id="kaleidoscope-container">
+            <div class="kaleidoscope-center"></div>
+        </div>
+    </div>
 
     <div class="main-container">
         <div class="bg-layer bg-gradient"></div>
@@ -883,7 +1302,7 @@
             </div>
 
             <div class="description">
-                <p>在时光与机械的交织中，记录思绪的流转。<br>技术、文学、幻想与游戏，皆是浪漫的注脚。</p>
+                <p>在时光与机械的交织中,记录思绪的流转。<br>技术、文学、幻想与游戏,皆是浪漫的注脚。</p>
             </div>
 
             <div class="enter-section">
@@ -906,135 +1325,32 @@
         // ===== 重构的渐开线齿轮生成器 (Woodgears Logic) =====
         class InvoluteGearGenerator {
             constructor() {
-                // 默认压力角 20度
                 this.pressureAngle = 20 * Math.PI / 180;
             }
 
-            /**
-             * 生成齿轮SVG路径数据
-             * @param {number} numTeeth 齿数
-             * @param {number} outerRadius 外径(齿顶圆半径)
-             * @param {number} holeRadius 中心孔半径
-             */
             generatePath(numTeeth, outerRadius, holeRadius) {
-                // 1. 计算齿轮参数
-                // 模数计算：外径 = 模数 * (齿数 + 2) -> 模数 = 外径 / (齿数 + 2)
                 const module = outerRadius / (numTeeth + 2) * 2;
-                const pitchRadius = (module * numTeeth) / 2; // 分度圆半径
-                const baseRadius = pitchRadius * Math.cos(this.pressureAngle); // 基圆半径
-                const dedendum = module * 1.25; // 齿根高
-                const rootRadius = pitchRadius - dedendum; // 齿根圆半径
+                const pitchRadius = (module * numTeeth) / 2;
+                const baseRadius = pitchRadius * Math.cos(this.pressureAngle);
+                const dedendum = module * 1.25;
+                const rootRadius = pitchRadius - dedendum;
                 
-                // 2. 生成一个齿的渐开线轮廓
-                // 我们只需要从基圆到外圆的一段渐开线
                 const stepCount = 15;
                 const profilePoints = [];
                 
-                // 渐开线函数：
-                // x = r * (cos(t) + t*sin(t))
-                // y = r * (sin(t) - t*cos(t))
-                // t 是展开角（弧度）
-                
-                // 计算最大的展开角 t，对应外圆半径
-                // R = Rb * sqrt(1 + t^2)  ->  t = sqrt((R/Rb)^2 - 1)
                 const maxT = Math.sqrt(Math.pow(outerRadius / baseRadius, 2) - 1);
                 
                 for (let i = 0; i <= stepCount; i++) {
                     const t = maxT * (i / stepCount);
-                    // 标准渐开线方程
                     const x = baseRadius * (Math.cos(t) + t * Math.sin(t));
                     const y = baseRadius * (Math.sin(t) - t * Math.cos(t));
                     profilePoints.push({x, y});
                 }
                 
-                // 3. 计算齿厚角度偏移
-                // 在分度圆上，齿厚 = 齿槽 = PI * module / 2
-                // 半齿厚对应的角度 alpha = (PI/2) / N
-                // 渐开线在分度圆处的极角 theta_pitch = inv(pressureAngle) = tan(20) - 20_rad
                 const invAlpha = Math.tan(this.pressureAngle) - this.pressureAngle;
-                // 我们需要旋转渐开线，使得分度圆上的点正好落在 X轴上方半齿宽的位置
-                // 目标角度 = 90度/N
                 const targetAngle = (Math.PI / 2) / numTeeth;
-                // 渐开线当前在分度圆处的角度（atan2(y,x)）
-                // 实际上我们可以简化：半齿厚角度 - invAlpha
                 const angleOffset = targetAngle + invAlpha;
                 
-                // 4. 构建完整的SVG路径
-                let d = "";
-                const anglePerTooth = (2 * Math.PI) / numTeeth;
-
-                for (let i = 0; i < numTeeth; i++) {
-                    const rotation = i * anglePerTooth;
-                    
-                    // --- 左侧齿廓 (镜像) ---
-                    for (let j = stepCount; j >= 0; j--) {
-                        const p = profilePoints[j];
-                        // 镜像：y取反
-                        // 旋转：(-angleOffset) 然后再加上全局旋转 (rotation)
-                        const angle = Math.atan2(-p.y, p.x) + angleOffset + rotation;
-                        const dist = Math.sqrt(p.x*p.x + p.y*p.y);
-                        const px = dist * Math.cos(angle);
-                        const py = dist * Math.sin(angle);
-                        
-                        if (j === stepCount && i === 0) d += `M ${px.toFixed(3)} ${py.toFixed(3)}`;
-                        else d += ` L ${px.toFixed(3)} ${py.toFixed(3)}`;
-                    }
-
-                    // --- 齿根部分 (连接到下一个齿的起始点) ---
-                    // 简单的直线或圆弧连接到下一个齿的起点
-                    // 这里为了简化计算，直接连线。对于Woodgears风格，齿根通常是个U型，
-                    // 但SVG渲染小尺寸时，从基圆连到齿根圆再连回来即可。
-                    // 计算当前齿左侧基圆点
-                    const baseP = profilePoints[0];
-                    const leftBaseAngle = Math.atan2(-baseP.y, baseP.x) + angleOffset + rotation;
-                    
-                    // 下一个齿右侧基圆点
-                    const rightBaseAngle = Math.atan2(baseP.y, baseP.x) - angleOffset + rotation + anglePerTooth;
-                    
-                    // 插入齿根圆上的点 (为了视觉效果，向内收一点)
-                    const rootX1 = rootRadius * Math.cos(leftBaseAngle);
-                    const rootY1 = rootRadius * Math.sin(leftBaseAngle);
-                    const rootX2 = rootRadius * Math.cos(rightBaseAngle);
-                    const rootY2 = rootRadius * Math.sin(rightBaseAngle);
-                    
-                    d += ` L ${rootX1.toFixed(3)} ${rootY1.toFixed(3)}`;
-                    d += ` A ${rootRadius.toFixed(3)} ${rootRadius.toFixed(3)} 0 0 1 ${rootX2.toFixed(3)} ${rootY2.toFixed(3)}`;
-
-                    // --- 右侧齿廓 (正常) ---
-                    for (let j = 0; j <= stepCount; j++) {
-                        const p = profilePoints[j];
-                        // 旋转：(-angleOffset) + rotation + anglePerTooth (下一个齿的位置前移回)
-                        // 实际上是当前齿的右侧： -angleOffset + rotation + anglePerTooth ??? 
-                        // 不，应该是在当前基准线上： angle = atan2(y,x) - angleOffset + rotation + anglePerTooth
-                        // 等等，简单的做法是：
-                        // 左侧是: +angleOffset
-                        // 右侧是: -angleOffset + anglePerTooth ? 不对，那是下一个齿。
-                        // 当前齿右侧: Math.atan2(p.y, p.x) - angleOffset + rotation
-                        const angle = Math.atan2(p.y, p.x) - angleOffset + rotation + anglePerTooth; 
-                        
-                        // 修正逻辑：
-                        // 上面左侧是用镜像(y负) + angleOffset.
-                        // 右侧应该用原点(y正) - angleOffset?
-                        // 让我们重新梳理：
-                        // 齿中心线在 rotation 处。
-                        // 左边面：角度 = rotation + (targetAngle + invAlpha) - inv(r)
-                        // 右边面：角度 = rotation - (targetAngle + invAlpha) + inv(r)
-                        
-                        // 使用之前的逻辑修正：
-                        // 右侧齿廓应该属于"下一个"齿的开始部分，或者当前齿的结束部分。
-                        // 我们的循环结构是：画左面 -> 画齿根 -> 画右面(其实是下一个齿的右面? 不，是当前齿的右面)。
-                        // 修正循环结构： 画一个齿 = 左轮廓(高到低) -> 齿根 -> 右轮廓(低到高) -> 齿顶
-                        
-                        // 重来：
-                        // 1. 右轮廓 (从基圆到齿顶)
-                        // 2. 齿顶圆弧
-                        // 3. 左轮廓 (从齿顶到基圆) - 属于下一个齿？
-                        // 这样比较顺。
-                    }
-                }
-                d += " Z"; // 闭合
-                
-                // 由于上面的循环逻辑稍微复杂，我们采用更直接的点生成法
                 return this.generateSimplePath(numTeeth, outerRadius, holeRadius, rootRadius, baseRadius, profilePoints, angleOffset);
             }
 
@@ -1045,10 +1361,6 @@
                 for(let i=0; i<numTeeth; i++) {
                     const centerAngle = i * anglePerTooth;
                     
-                    // 1. 右侧面 (Right Flank) - 从基圆往外
-                    // 角度 = centerAngle - angleOffset + inv(r)
-                    // profilePoints 里的点已经包含了 inv(r) 的偏移 (atan2(y,x))
-                    // 所以：angle = centerAngle - angleOffset + atan2(p.y, p.x)
                     for(let j=0; j<profilePoints.length; j++) {
                         const p = profilePoints[j];
                         const r = Math.sqrt(p.x*p.x + p.y*p.y);
@@ -1062,25 +1374,19 @@
                         else d += ` L ${px.toFixed(3)} ${py.toFixed(3)}`;
                     }
                     
-                    // 2. 齿顶圆弧 (Top Land)
-                    // 连接到左侧面的顶点
                     const pTop = profilePoints[profilePoints.length-1];
                     const rTop = Math.sqrt(pTop.x*pTop.x + pTop.y*pTop.y);
                     const invAngleTop = Math.atan2(pTop.y, pTop.x);
-                    // 左侧面的角度 = centerAngle + angleOffset - invAngle
-                    // 也就是镜像
                     const thetaTopLeft = centerAngle + angleOffset - invAngleTop;
                     const pxTop = rTop * Math.cos(thetaTopLeft);
                     const pyTop = rTop * Math.sin(thetaTopLeft);
                     
                     d += ` A ${rTop.toFixed(3)} ${rTop.toFixed(3)} 0 0 1 ${pxTop.toFixed(3)} ${pyTop.toFixed(3)}`;
                     
-                    // 3. 左侧面 (Left Flank) - 从外往里
                     for(let j=profilePoints.length-1; j>=0; j--) {
                         const p = profilePoints[j];
                         const r = Math.sqrt(p.x*p.x + p.y*p.y);
                         const invAngle = Math.atan2(p.y, p.x);
-                        // 镜像：y取反，相当于角度取反
                         const theta = centerAngle + angleOffset - invAngle;
                         
                         const px = r * Math.cos(theta);
@@ -1089,19 +1395,13 @@
                         d += ` L ${px.toFixed(3)} ${py.toFixed(3)}`;
                     }
                     
-                    // 4. 齿根 (Bottom Land) - 连接到下一个齿的右侧面起点
                     const nextCenterAngle = (i + 1) * anglePerTooth;
-                    const pBase = profilePoints[0]; // 基圆点
+                    const pBase = profilePoints[0];
                     const invAngleBase = Math.atan2(pBase.y, pBase.x);
                     
-                    // 当前齿结束点(基圆上)
-                    // theta = centerAngle + angleOffset - invAngleBase
-                    
-                    // 下一个齿开始点(基圆上)
                     const nextThetaStart = nextCenterAngle - angleOffset + invAngleBase;
                     
-                    // 简单的直线连接(或者向圆心凹陷一点做齿根圆)
-                    const rootX = rootRadius * Math.cos((centerAngle + angleOffset + nextThetaStart)/2); // 中点
+                    const rootX = rootRadius * Math.cos((centerAngle + angleOffset + nextThetaStart)/2);
                     const rootY = rootRadius * Math.sin((centerAngle + angleOffset + nextThetaStart)/2);
                     
                     const nextPx = baseRadius * Math.cos(nextThetaStart);
@@ -1113,7 +1413,6 @@
                 
                 d += " Z";
                 
-                // 中心孔
                 d += ` M ${holeRadius} 0`;
                 d += ` A ${holeRadius} ${holeRadius} 0 1 0 ${-holeRadius} 0`;
                 d += ` A ${holeRadius} ${holeRadius} 0 1 0 ${holeRadius} 0 Z`;
@@ -1122,7 +1421,6 @@
             }
             
             generateSVG(teeth, size = 100) {
-                // 半径稍小于视口的一半以留边距
                 const outerRadius = (size / 2) * 0.95;
                 const holeRadius = outerRadius * 0.25;
                 const pathData = this.generatePath(teeth, outerRadius, holeRadius);
@@ -1136,10 +1434,8 @@
         // ===== 创建齿轮并添加到页面 =====
         function createGears() {
             const gearSystem = document.getElementById('gear-system');
-            const loaderGear = document.getElementById('loader-gear');
             const generator = new InvoluteGearGenerator();
             
-            // 齿轮配置：位置class, 齿数
             const gearConfigs = [
                 { class: 'gear-1', teeth: 32 },
                 { class: 'gear-2', teeth: 32 },
@@ -1155,7 +1451,6 @@
                 { class: 'gear-12', teeth: 12 }
             ];
 
-            // 生成背景装饰齿轮
             gearConfigs.forEach(config => {
                 const svg = generator.generateSVG(config.teeth, 100);
                 const gearDiv = document.createElement('div');
@@ -1164,11 +1459,27 @@
                 gearSystem.appendChild(gearDiv);
             });
 
-            // 生成Loading齿轮
-            // 手动生成path放入现有svg
-            const loaderPath = generator.generatePath(16, 45, 12); // radius 45 to fit in 100x100 viewbox (center 0,0)
-            // loader-gear的viewBox是0 0 100 100，所以需要平移50,50
-            loaderGear.innerHTML = `<g transform="translate(50, 50)"><path d="${loaderPath}" fill-rule="evenodd"/></g>`;
+            // 创建加载齿轮
+            const mainGearPath = generator.generatePath(16, 45, 12);
+            document.getElementById('loader-gear-main').innerHTML = `<path d="${mainGearPath}" fill-rule="evenodd"/>`;
+            
+            const orbitGearPath = generator.generatePath(8, 18, 5);
+            ['orbit-1', 'orbit-2', 'orbit-3', 'orbit-4'].forEach(id => {
+                document.getElementById(id).innerHTML = `<path d="${orbitGearPath}" fill-rule="evenodd"/>`;
+            });
+
+            // 创建加载粒子
+            const particlesContainer = document.getElementById('loader-particles');
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'loader-particle';
+                const angle = (i / 12) * Math.PI * 2;
+                const radius = 80;
+                particle.style.left = `${50 + Math.cos(angle) * radius}%`;
+                particle.style.top = `${50 + Math.sin(angle) * radius}%`;
+                particle.style.animationDelay = `${i * 0.1}s`;
+                particlesContainer.appendChild(particle);
+            }
         }
 
         // ===== 全局变量 =====
@@ -1282,7 +1593,6 @@
                     p.y += p.speedY;
                     p.pulse += 0.02;
 
-                    // 鼠标引力
                     const dx = mouseX - p.x;
                     const dy = mouseY - p.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1291,7 +1601,6 @@
                         p.y += dy * 0.01;
                     }
 
-                    // 边界处理
                     if (p.x < 0) p.x = this.canvas.width;
                     if (p.x > this.canvas.width) p.x = 0;
                     if (p.y < 0) p.y = this.canvas.height;
@@ -1313,7 +1622,6 @@
                     this.ctx.fill();
                 });
 
-                // 连接线
                 this.particles.forEach((p1, i) => {
                     this.particles.slice(i + 1).forEach(p2 => {
                         const dx = p1.x - p2.x;
@@ -1336,15 +1644,16 @@
                 requestAnimationFrame(() => this.animate());
             }
         }
-        // ===== 加载动画 =====
+
+        // ===== 高级加载动画 =====
         function simulateLoading() {
-            const progressBar = document.querySelector('.loader-progress-bar');
             const loaderMask = document.querySelector('.loader-mask');
             const mainContainer = document.querySelector('.main-container');
+            const percentageEl = document.getElementById('loader-percentage');
             let progress = 0;
 
             const interval = setInterval(() => {
-                progress += Math.random() * 15 + 5;
+                progress += Math.random() * 8 + 3;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
@@ -1358,8 +1667,8 @@
                         }, 500);
                     }, 300);
                 }
-                progressBar.style.width = progress + '%';
-            }, 150);
+                percentageEl.textContent = Math.floor(progress) + '%';
+            }, 120);
         }
 
         // ===== 入场动画 =====
@@ -1401,17 +1710,225 @@
             }, 800);
         }
 
+        // ===== 超级高级退出过渡系统 =====
+        function createExitTransition() {
+            const generator = new InvoluteGearGenerator();
+            
+            // 创建六边形网格
+            const hexGridLayer = document.getElementById('hex-grid-layer');
+            const cols = 12;
+            const rows = 8;
+            const hexWidth = window.innerWidth / cols;
+            const hexHeight = window.innerHeight / rows;
+            
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const hex = document.createElement('div');
+                    hex.className = 'hex-cell';
+                    hex.style.width = hexWidth + 'px';
+                    hex.style.height = hexHeight + 'px';
+                    hex.style.left = (j * hexWidth) + 'px';
+                    hex.style.top = (i * hexHeight) + 'px';
+                    hex.style.transitionDelay = `${(i + j) * 0.02}s`;
+                    hexGridLayer.appendChild(hex);
+                }
+            }
+            
+            // 创建齿轮爆发
+            const gearBurstLayer = document.getElementById('gear-burst-layer');
+            const gearCounts = [6, 8, 10, 12];
+            gearCounts.forEach((count, layer) => {
+                for (let i = 0; i < count; i++) {
+                    const gear = document.createElement('div');
+                    gear.className = 'burst-gear';
+                    const angle = (i / count) * Math.PI * 2;
+                    const distance = 100 + layer * 80;
+                    gear.style.left = '50%';
+                    gear.style.top = '50%';
+                    gear.style.width = (60 - layer * 10) + 'px';
+                    gear.style.height = (60 - layer * 10) + 'px';
+                    gear.style.transitionDelay = `${0.2 + layer * 0.1 + i * 0.02}s`;
+                    
+                    const gearSvg = generator.generateSVG(8 + layer * 2, 100);
+                    gear.innerHTML = gearSvg;
+                    gearBurstLayer.appendChild(gear);
+                    
+                    gear.dataset.angle = angle;
+                    gear.dataset.distance = distance;
+                }
+            });
+            
+            // 创建粒子爆炸
+            const particleLayer = document.getElementById('particle-explosion-layer');
+            for (let i = 0; i < 100; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'explosion-particle';
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 600 + 200;
+                particle.style.transitionDelay = `${0.3 + Math.random() * 0.3}s`;
+                particleLayer.appendChild(particle);
+                
+                particle.dataset.angle = angle;
+                particle.dataset.distance = distance;
+            }
+            
+            // 创建波纹
+            const rippleLayer = document.getElementById('ripple-layer');
+            for (let i = 0; i < 5; i++) {
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple-circle';
+                ripple.style.transitionDelay = `${0.4 + i * 0.15}s`;
+                rippleLayer.appendChild(ripple);
+            }
+            
+            // 创建分形裂纹
+            const fractalLayer = document.getElementById('fractal-layer');
+            function createFractalBranch(x, y, angle, length, depth) {
+                if (depth === 0 || length < 5) return;
+                
+                const line = document.createElement('div');
+                line.className = 'fractal-line';
+                line.style.left = x + 'px';
+                line.style.top = y + 'px';
+                line.style.width = '0px';
+                line.style.height = '2px';
+                line.style.transform = `rotate(${angle}deg)`;
+                line.style.transitionDelay = `${0.5 + (5 - depth) * 0.08}s`;
+                fractalLayer.appendChild(line);
+                
+                line.dataset.finalWidth = length;
+                
+                const endX = x + Math.cos(angle * Math.PI / 180) * length;
+                const endY = y + Math.sin(angle * Math.PI / 180) * length;
+                
+                const branches = 3;
+                for (let i = 0; i < branches; i++) {
+                    const newAngle = angle + (i - 1) * 30;
+                    const newLength = length * 0.7;
+                    setTimeout(() => {
+                        createFractalBranch(endX, endY, newAngle, newLength, depth - 1);
+                    }, 50);
+                }
+            }
+            
+            createFractalBranch(window.innerWidth / 2, window.innerHeight / 2, 0, 150, 5);
+            createFractalBranch(window.innerWidth / 2, window.innerHeight / 2, 90, 150, 5);
+            createFractalBranch(window.innerWidth / 2, window.innerHeight / 2, 180, 150, 5);
+            createFractalBranch(window.innerWidth / 2, window.innerHeight / 2, 270, 150, 5);
+            
+            // 创建光束
+            const lightBeamLayer = document.getElementById('light-beam-layer');
+            for (let i = 0; i < 16; i++) {
+                const beam = document.createElement('div');
+                beam.className = 'light-beam';
+                const angle = (i / 16) * 360;
+                beam.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+                beam.style.transitionDelay = `${0.6 + i * 0.02}s`;
+                lightBeamLayer.appendChild(beam);
+            }
+
+            // 创建加载效果2的万花筒齿轮矩阵
+            const kaleidoscopeContainer = document.getElementById('kaleidoscope-container');
+            
+            // 创建3x3齿轮网格
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const gear = document.createElement('div');
+                    gear.className = 'kaleidoscope-gear';
+                    gear.style.left = `${col * 33.33 + 3.33}%`;
+                    gear.style.top = `${row * 33.33 + 3.33}%`;
+                    
+                    // 交替旋转方向
+                    const isClockwise = (row + col) % 2 === 0;
+                    gear.style.animation = `${isClockwise ? 'kaleidoSpin1' : 'kaleidoSpin2'} ${2 + (row + col) * 0.15}s linear infinite, kaleidoPulse ${3 + (row * 3 + col) * 0.1}s ease-in-out infinite`;
+                    gear.style.animationDelay = `0s, ${(row * 3 + col) * 0.08}s`;
+                    
+                    const gearSvg = generator.generateSVG(12 + (row + col) * 2, 100);
+                    gear.innerHTML = gearSvg;
+                    kaleidoscopeContainer.appendChild(gear);
+                }
+            }
+            
+            // 创建环绕粒子
+            for (let i = 0; i < 24; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'orbit-particle';
+                particle.style.left = '50%';
+                particle.style.top = '50%';
+                particle.style.animation = `orbitRotate ${4 + i * 0.1}s linear infinite`;
+                particle.style.animationDelay = `${i * 0.1}s`;
+                kaleidoscopeContainer.appendChild(particle);
+            }
+        }
+
+        function triggerExitTransition(targetUrl) {
+            const exitOverlay = document.querySelector('.exit-overlay');
+            const scanline = document.getElementById('scanline');
+            
+            // 立即开始加载目标网址
+            window.location.href = targetUrl;
+            
+            // 激活所有层
+            exitOverlay.classList.add('active');
+            
+            // 扫描线动画
+            let scanY = 0;
+            const scanInterval = setInterval(() => {
+                scanY += 8;
+                scanline.style.top = scanY + 'px';
+                if (scanY > window.innerHeight) {
+                    clearInterval(scanInterval);
+                }
+            }, 10);
+            
+            // 齿轮爆发动画
+            setTimeout(() => {
+                const gears = document.querySelectorAll('.burst-gear');
+                gears.forEach(gear => {
+                    const angle = parseFloat(gear.dataset.angle);
+                    const distance = parseFloat(gear.dataset.distance);
+                    const x = Math.cos(angle) * distance;
+                    const y = Math.sin(angle) * distance;
+                    gear.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(3) rotate(360deg)`;
+                });
+            }, 200);
+            
+            // 粒子爆炸动画
+            setTimeout(() => {
+                const particles = document.querySelectorAll('.explosion-particle');
+                particles.forEach(p => {
+                    const angle = parseFloat(p.dataset.angle);
+                    const distance = parseFloat(p.dataset.distance);
+                    const x = Math.cos(angle) * distance;
+                    const y = Math.sin(angle) * distance;
+                    p.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                    p.style.opacity = '0';
+                });
+            }, 300);
+            
+            // 分形线条展开
+            setTimeout(() => {
+                const fractalLines = document.querySelectorAll('.fractal-line');
+                fractalLines.forEach(line => {
+                    line.style.width = line.dataset.finalWidth + 'px';
+                });
+            }, 500);
+            
+            // 1.5秒后显示加载效果2
+            setTimeout(() => {
+                exitOverlay.style.transition = 'opacity 0.5s ease';
+                exitOverlay.style.opacity = '0';
+                
+                const loadingEffect2 = document.getElementById('loading-effect-2');
+                loadingEffect2.classList.add('active');
+            }, 1500);
+        }
+
         // ===== 页面跳转动画 =====
         function navigateToSite(e) {
             e.preventDefault();
-            const exitOverlay = document.querySelector('.exit-overlay');
             const targetUrl = e.currentTarget.getAttribute('href');
-
-            exitOverlay.classList.add('active');
-
-            setTimeout(() => {
-                window.location.href = targetUrl;
-            }, 800);
+            triggerExitTransition(targetUrl);
         }
 
         // ===== 悬停效果 =====
@@ -1431,17 +1948,15 @@
 
         // ===== 初始化 =====
         document.addEventListener('DOMContentLoaded', () => {
-            // 生成齿轮
             createGears();
+            createExitTransition();
 
-            // 光标
             document.addEventListener('mousemove', (e) => {
                 updateCursor(e);
                 updateGlow();
             });
             animateCursor();
 
-            // 粒子系统
             const canvas = document.getElementById('particles-canvas');
             const particleSystem = new ParticleSystem(canvas);
             particleSystem.animate();
@@ -1450,14 +1965,11 @@
                 particleSystem.resize();
             });
 
-            // 进入按钮
             document.getElementById('enter-btn').addEventListener('click', navigateToSite);
 
-            // 加载
             simulateLoading();
             setTimeout(addHoverEffects, 2000);
 
-            // 过渡样式
             document.querySelectorAll('.logo-section, .title-section, .description, .enter-section').forEach(el => {
                 el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
             });
