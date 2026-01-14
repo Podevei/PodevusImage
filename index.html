@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podevus</title>
+    <link rel="icon" type="image/x-icon" href="logo.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Shippori+Mincho:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 大正浪漫 - 亮色模式 */
+            --bg-primary: #FDF8F3;
+            --bg-secondary: #F5EDE4;
+            --bg-gradient-1: #FFF9F2;
+            --bg-gradient-2: #F8E8D6;
+            --text-primary: #2C1810;
+            --text-secondary: #5C4033;
+            --text-muted: #8B7355;
+            --accent-gold: #C9A962;
+            --accent-copper: #B87333;
+            --accent-burgundy: #722F37;
+            --accent-cream: #FFF8DC;
+            --border-ornate: #D4B896;
+            --shadow-color: rgba(139, 115, 85, 0.2);
+            --particle-color: rgba(201, 169, 98, 0.6);
+            --gear-color: rgba(184, 115, 51, 0.12);
+            --line-color: rgba(212, 184, 150, 0.4);
+            --glow-color: rgba(201, 169, 98, 0.3);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* 大正浪漫 - 深色模式 */
+                --bg-primary: #1A1512;
+                --bg-secondary: #231D18;
+                --bg-gradient-1: #1A1512;
+                --bg-gradient-2: #2A211A;
+                --text-primary: #F5E6D3;
+                --text-secondary: #D4C4B0;
+                --text-muted: #9A8B7A;
+                --accent-gold: #D4AF37;
+                --accent-copper: #CD7F32;
+                --accent-burgundy: #8B3A3A;
+                --accent-cream: #3D3428;
+                --border-ornate: #5C4D3C;
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --particle-color: rgba(212, 175, 55, 0.7);
+                --gear-color: rgba(205, 127, 50, 0.1);
+                --line-color: rgba(92, 77, 60, 0.5);
+                --glow-color: rgba(212, 175, 55, 0.25);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', 'Shippori Mincho', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            cursor: none;
+            transition: background 0.6s ease, color 0.6s ease;
+        }
+
+        /* ===== 高级光标系统 ===== */
+        .cursor-main {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-hexagon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.2s ease, opacity 0.3s ease;
+        }
+
+        .cursor-hexagon svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: var(--accent-gold);
+            stroke-width: 1.5;
+            transition: stroke 0.3s ease;
+        }
+
+        .cursor-hexagon .hex-inner {
+            stroke: var(--accent-copper);
+            stroke-width: 1;
+            transform-origin: center;
+            animation: hexRotate 8s linear infinite reverse;
+        }
+
+        .cursor-center {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-gold);
+            transform: translate(-50%, -50%) rotate(45deg);
+            pointer-events: none;
+            z-index: 10002;
+            transition: transform 0.15s ease, background 0.3s ease;
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 9999;
+        }
+
+        .cursor-main.hover .cursor-hexagon {
+            transform: scale(1.5) rotate(30deg);
+        }
+
+        .cursor-main.hover .cursor-hexagon svg {
+            stroke: var(--accent-copper);
+        }
+
+        .cursor-center.hover {
+            transform: translate(-50%, -50%) rotate(45deg) scale(1.5);
+            background: var(--accent-copper);
+        }
+
+        @keyframes hexRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== 加载遮罩 ===== */
+        .loader-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.6s ease;
+        }
+
+        .loader-gear-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .loader-gear-svg {
+            width: 100%;
+            height: 100%;
+            animation: rotateGear 3s linear infinite;
+        }
+
+        .loader-gear-svg path {
+            fill: var(--accent-copper);
+        }
+
+        .loader-text {
+            margin-top: 25px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .loader-progress {
+            width: 180px;
+            height: 1px;
+            background: var(--border-ornate);
+            margin-top: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-copper));
+            transition: width 0.3s ease;
+        }
+
+        @keyframes rotateGear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== 主容器 ===== */
+        .main-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .main-container.loaded {
+            opacity: 1;
+        }
+
+        /* ===== 背景层 ===== */
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            background: radial-gradient(ellipse at 30% 20%, var(--bg-gradient-2) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, var(--bg-gradient-2) 0%, transparent 50%),
+                        var(--bg-gradient-1);
+            transition: background 0.6s ease;
+        }
+
+        .bg-grid {
+            background-image: 
+                linear-gradient(var(--line-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-color) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.3;
+        }
+
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+        }
+
+        /* ===== 齿轮容器 ===== */
+        .gear-system {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .gear {
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .gear svg {
+            width: 100%;
+            height: 100%;
+            transition: fill 0.6s ease;
+            overflow: visible;
+        }
+
+        .gear svg path {
+            fill: var(--gear-color);
+        }
+
+        /* 四角大齿轮 */
+        .gear-1 { top: -12%; left: -12%; width: 320px; height: 320px; animation: gearSpin 60s linear infinite; }
+        .gear-2 { top: -12%; right: -12%; width: 320px; height: 320px; animation: gearSpin 60s linear infinite reverse; }
+        .gear-3 { bottom: -12%; left: -12%; width: 320px; height: 320px; animation: gearSpin 60s linear infinite reverse; }
+        .gear-4 { bottom: -12%; right: -12%; width: 320px; height: 320px; animation: gearSpin 60s linear infinite; }
+
+        /* 四边中型齿轮 */
+        .gear-5 { top: -6%; left: 50%; transform: translateX(-50%); width: 140px; height: 140px; animation: gearSpinX 40s linear infinite; }
+        .gear-6 { bottom: -6%; left: 50%; transform: translateX(-50%); width: 140px; height: 140px; animation: gearSpinX 40s linear infinite reverse; }
+        .gear-7 { top: 50%; left: -4%; transform: translateY(-50%); width: 120px; height: 120px; animation: gearSpinY 35s linear infinite reverse; }
+        .gear-8 { top: 50%; right: -4%; transform: translateY(-50%); width: 120px; height: 120px; animation: gearSpinY 35s linear infinite; }
+
+        /* 小型装饰齿轮 */
+        .gear-9 { top: 18%; left: 15%; width: 70px; height: 70px; animation: gearSpin 25s linear infinite; }
+        .gear-10 { top: 18%; right: 15%; width: 70px; height: 70px; animation: gearSpin 25s linear infinite reverse; }
+        .gear-11 { bottom: 18%; left: 15%; width: 70px; height: 70px; animation: gearSpin 25s linear infinite reverse; }
+        .gear-12 { bottom: 18%; right: 15%; width: 70px; height: 70px; animation: gearSpin 25s linear infinite; }
+
+        @keyframes gearSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes gearSpinX {
+            from { transform: translateX(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        @keyframes gearSpinY {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* ===== 粒子画布 ===== */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ===== 装饰线条 ===== */
+        .decorative-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .deco-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, var(--border-ornate), transparent);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .deco-line-h1 { top: 12%; left: 0; width: 25%; height: 1px; }
+        .deco-line-h2 { top: 12%; right: 0; width: 25%; height: 1px; }
+        .deco-line-h3 { bottom: 12%; left: 0; width: 25%; height: 1px; }
+        .deco-line-h4 { bottom: 12%; right: 0; width: 25%; height: 1px; }
+
+        .deco-line-v1 { 
+            top: 0; left: 12%; width: 1px; height: 20%; 
+            background: linear-gradient(to bottom, transparent, var(--border-ornate), transparent);
+        }
+        .deco-line-v2 { 
+            top: 0; right: 12%; width: 1px; height: 20%; 
+            background: linear-gradient(to bottom, transparent, var(--border-ornate), transparent);
+        }
+        .deco-line-v3 { 
+            bottom: 0; left: 12%; width: 1px; height: 20%; 
+            background: linear-gradient(to top, transparent, var(--border-ornate), transparent);
+        }
+        .deco-line-v4 { 
+            bottom: 0; right: 12%; width: 1px; height: 20%; 
+            background: linear-gradient(to top, transparent, var(--border-ornate), transparent);
+        }
+
+        /* ===== 角落装饰 ===== */
+        .corner-ornament {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .corner-ornament svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: var(--border-ornate);
+            stroke-width: 1;
+            transition: stroke 0.6s ease;
+        }
+
+        .corner-tl { top: 25px; left: 25px; }
+        .corner-tr { top: 25px; right: 25px; transform: scaleX(-1); }
+        .corner-bl { bottom: 25px; left: 25px; transform: scaleY(-1); }
+        .corner-br { bottom: 25px; right: 25px; transform: scale(-1); }
+
+        /* ===== 内容区域 ===== */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        /* ===== Logo区域 ===== */
+        .logo-section {
+            position: relative;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .logo-frame {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-border {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--border-ornate);
+            transform: rotate(45deg);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo-border-inner {
+            position: absolute;
+            width: 82%;
+            height: 82%;
+            border: 1px solid var(--accent-gold);
+            transform: rotate(45deg);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo-placeholder {
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--accent-copper);
+            text-shadow: 0 0 30px var(--glow-color);
+            transition: all 0.4s ease;
+        }
+
+        .logo-frame:hover .logo-border {
+            transform: rotate(405deg);
+            border-color: var(--accent-gold);
+        }
+
+        .logo-frame:hover .logo-border-inner {
+            transform: rotate(405deg);
+            border-color: var(--accent-copper);
+        }
+
+        .logo-frame:hover .logo-placeholder {
+            color: var(--accent-gold);
+            text-shadow: 0 0 50px var(--glow-color);
+        }
+
+        /* ===== 标题区域 ===== */
+        .title-section {
+            text-align: center;
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .title-ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .ornament-line {
+            width: 70px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        .ornament-diamond {
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--accent-gold);
+            transform: rotate(45deg);
+            position: relative;
+        }
+
+        .ornament-diamond::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-copper);
+            transform: translate(-50%, -50%);
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 400;
+            letter-spacing: 0.25em;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            transition: color 0.6s ease;
+        }
+
+        .main-title .letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: color 0.6s ease;
+        }
+
+        /* ===== 分隔装饰 ===== */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+            opacity: 0;
+        }
+
+        .divider-line {
+            width: 100px;
+            height: 1px;
+            background: var(--border-ornate);
+            transition: background 0.6s ease;
+        }
+
+        .divider-center {
+            width: 6px;
+            height: 6px;
+            border: 1px solid var(--accent-gold);
+            transform: rotate(45deg);
+        }
+
+        /* ===== 描述文字 ===== */
+        .description {
+            text-align: center;
+            max-width: 550px;
+            margin-bottom: 35px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .description p {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            line-height: 2;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            transition: color 0.6s ease;
+        }
+
+        /* ===== 进入按钮 ===== */
+        .enter-section {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .enter-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 18px 45px;
+            background: transparent;
+            border: 1px solid var(--accent-gold);
+            color: var(--text-primary);
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: none;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            transition: left 0.6s ease;
+            opacity: 0.3;
+        }
+
+        .enter-btn:hover::before {
+            left: 100%;
+        }
+
+        .enter-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent-cream);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+            z-index: -1;
+        }
+
+        .enter-btn:hover::after {
+            transform: scaleX(1);
+        }
+
+        .enter-btn:hover {
+            border-color: var(--accent-copper);
+            color: var(--accent-burgundy);
+        }
+
+        .btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-arrow {
+            position: relative;
+            z-index: 1;
+            width: 20px;
+            height: 1px;
+            background: var(--accent-gold);
+            transition: all 0.4s ease;
+        }
+
+        .btn-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 7px;
+            height: 7px;
+            border-right: 1px solid var(--accent-gold);
+            border-top: 1px solid var(--accent-gold);
+            transform: translateY(-50%) rotate(45deg);
+            transition: border-color 0.4s ease;
+        }
+
+        .enter-btn:hover .btn-arrow {
+            width: 28px;
+            background: var(--accent-copper);
+        }
+
+        .enter-btn:hover .btn-arrow::after {
+            border-color: var(--accent-copper);
+        }
+
+        /* ===== 底部信息 ===== */
+        .footer-info {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            opacity: 0;
+        }
+
+        .footer-item {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            transition: color 0.6s ease;
+        }
+
+        .footer-divider {
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gold);
+            transform: rotate(45deg);
+        }
+
+        /* ===== 退出动画 ===== */
+        .exit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 9998;
+            transform: translateY(100%);
+            transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .exit-overlay.active {
+            transform: translateY(0);
+        }
+
+        /* ===== 动态光晕 ===== */
+        .ambient-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.4;
+            filter: blur(60px);
+            z-index: 1;
+            transition: background 0.6s ease;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .corner-ornament {
+                width: 70px;
+                height: 70px;
+            }
+
+            .corner-tl, .corner-tr { top: 15px; }
+            .corner-bl, .corner-br { bottom: 15px; }
+            .corner-tl, .corner-bl { left: 15px; }
+            .corner-tr, .corner-br { right: 15px; }
+
+            .logo-frame {
+                width: 120px;
+                height: 120px;
+            }
+
+            .logo-placeholder {
+                font-size: 1.8rem;
+            }
+
+            .ornament-line {
+                width: 45px;
+            }
+
+            .description {
+                padding: 0 15px;
+            }
+
+            .footer-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .footer-divider {
+                display: none;
+            }
+
+            body {
+                cursor: auto;
+            }
+
+            .cursor-main, .cursor-center, .cursor-trail {
+                display: none;
+            }
+
+            .gear {
+                opacity: 0.5 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-main">
+        <div class="cursor-hexagon">
+            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                <polygon class="hex-outer" points="25,2 46,14 46,36 25,48 4,36 4,14" />
+                <polygon class="hex-inner" points="25,10 38,18 38,32 25,40 12,32 12,18" />
+            </svg>
+        </div>
+    </div>
+    <div class="cursor-center"></div>
+    <div id="cursor-trails"></div>
+
+    <div class="ambient-glow"></div>
+
+    <div class="loader-mask">
+        <div class="loader-gear-container">
+            <svg class="loader-gear-svg" id="loader-gear" viewBox="0 0 100 100"></svg>
+        </div>
+        <div class="loader-text">Loading</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <div class="exit-overlay"></div>
+
+    <div class="main-container">
+        <div class="bg-layer bg-gradient"></div>
+        <div class="bg-layer bg-grid"></div>
+        <div class="bg-layer bg-noise"></div>
+
+        <canvas id="particles-canvas"></canvas>
+
+        <div class="gear-system" id="gear-system"></div>
+
+        <div class="decorative-lines">
+            <div class="deco-line deco-line-h1"></div>
+            <div class="deco-line deco-line-h2"></div>
+            <div class="deco-line deco-line-h3"></div>
+            <div class="deco-line deco-line-h4"></div>
+            <div class="deco-line deco-line-v1"></div>
+            <div class="deco-line deco-line-v2"></div>
+            <div class="deco-line deco-line-v3"></div>
+            <div class="deco-line deco-line-v4"></div>
+        </div>
+
+        <div class="corner-ornament corner-tl">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 95 L5 5 L95 5" fill="none"/>
+                <path d="M15 85 L15 15 L85 15" fill="none"/>
+                <circle cx="15" cy="15" r="3" fill="currentColor"/>
+                <circle cx="5" cy="5" r="2" fill="currentColor"/>
+                <path d="M25 5 L25 25 L5 25" fill="none"/>
+            </svg>
+        </div>
+        <div class="corner-ornament corner-tr">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 95 L5 5 L95 5" fill="none"/>
+                <path d="M15 85 L15 15 L85 15" fill="none"/>
+                <circle cx="15" cy="15" r="3" fill="currentColor"/>
+                <circle cx="5" cy="5" r="2" fill="currentColor"/>
+                <path d="M25 5 L25 25 L5 25" fill="none"/>
+            </svg>
+        </div>
+        <div class="corner-ornament corner-bl">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 95 L5 5 L95 5" fill="none"/>
+                <path d="M15 85 L15 15 L85 15" fill="none"/>
+                <circle cx="15" cy="15" r="3" fill="currentColor"/>
+                <circle cx="5" cy="5" r="2" fill="currentColor"/>
+                <path d="M25 5 L25 25 L5 25" fill="none"/>
+            </svg>
+        </div>
+        <div class="corner-ornament corner-br">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 95 L5 5 L95 5" fill="none"/>
+                <path d="M15 85 L15 15 L85 15" fill="none"/>
+                <circle cx="15" cy="15" r="3" fill="currentColor"/>
+                <circle cx="5" cy="5" r="2" fill="currentColor"/>
+                <path d="M25 5 L25 25 L5 25" fill="none"/>
+            </svg>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="logo-section">
+                <div class="logo-frame">
+                    <div class="logo-border"></div>
+                    <div class="logo-border-inner"></div>
+                    <div class="logo-placeholder">P</div>
+                </div>
+            </div>
+
+            <div class="title-section">
+                <div class="title-ornament">
+                    <span class="ornament-line"></span>
+                    <span class="ornament-diamond"></span>
+                    <span class="ornament-line"></span>
+                </div>
+                <h1 class="main-title">
+                    <span class="letter">P</span><span class="letter">o</span><span class="letter">d</span><span class="letter">e</span><span class="letter">v</span><span class="letter">u</span><span class="letter">s</span>
+                </h1>
+            </div>
+
+            <div class="divider">
+                <span class="divider-line"></span>
+                <span class="divider-center"></span>
+                <span class="divider-line"></span>
+            </div>
+
+            <div class="description">
+                <p>在时光与机械的交织中，记录思绪的流转。<br>技术、文学、幻想与游戏，皆是浪漫的注脚。</p>
+            </div>
+
+            <div class="enter-section">
+                <a href="https://podevei.github.io/Podevus/" class="enter-btn" id="enter-btn">
+                    <span class="btn-arrow"></span>
+                    <span class="btn-text">开始</span>
+                    <span class="btn-arrow"></span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <span class="footer-item">Est. 2024</span>
+            <span class="footer-divider"></span>
+            <span class="footer-item">Personal Blog</span>
+        </div>
+    </div>
+
+    <script>
+        // ===== 重构的渐开线齿轮生成器 (Woodgears Logic) =====
+        class InvoluteGearGenerator {
+            constructor() {
+                // 默认压力角 20度
+                this.pressureAngle = 20 * Math.PI / 180;
+            }
+
+            /**
+             * 生成齿轮SVG路径数据
+             * @param {number} numTeeth 齿数
+             * @param {number} outerRadius 外径(齿顶圆半径)
+             * @param {number} holeRadius 中心孔半径
+             */
+            generatePath(numTeeth, outerRadius, holeRadius) {
+                // 1. 计算齿轮参数
+                // 模数计算：外径 = 模数 * (齿数 + 2) -> 模数 = 外径 / (齿数 + 2)
+                const module = outerRadius / (numTeeth + 2) * 2;
+                const pitchRadius = (module * numTeeth) / 2; // 分度圆半径
+                const baseRadius = pitchRadius * Math.cos(this.pressureAngle); // 基圆半径
+                const dedendum = module * 1.25; // 齿根高
+                const rootRadius = pitchRadius - dedendum; // 齿根圆半径
+                
+                // 2. 生成一个齿的渐开线轮廓
+                // 我们只需要从基圆到外圆的一段渐开线
+                const stepCount = 15;
+                const profilePoints = [];
+                
+                // 渐开线函数：
+                // x = r * (cos(t) + t*sin(t))
+                // y = r * (sin(t) - t*cos(t))
+                // t 是展开角（弧度）
+                
+                // 计算最大的展开角 t，对应外圆半径
+                // R = Rb * sqrt(1 + t^2)  ->  t = sqrt((R/Rb)^2 - 1)
+                const maxT = Math.sqrt(Math.pow(outerRadius / baseRadius, 2) - 1);
+                
+                for (let i = 0; i <= stepCount; i++) {
+                    const t = maxT * (i / stepCount);
+                    // 标准渐开线方程
+                    const x = baseRadius * (Math.cos(t) + t * Math.sin(t));
+                    const y = baseRadius * (Math.sin(t) - t * Math.cos(t));
+                    profilePoints.push({x, y});
+                }
+                
+                // 3. 计算齿厚角度偏移
+                // 在分度圆上，齿厚 = 齿槽 = PI * module / 2
+                // 半齿厚对应的角度 alpha = (PI/2) / N
+                // 渐开线在分度圆处的极角 theta_pitch = inv(pressureAngle) = tan(20) - 20_rad
+                const invAlpha = Math.tan(this.pressureAngle) - this.pressureAngle;
+                // 我们需要旋转渐开线，使得分度圆上的点正好落在 X轴上方半齿宽的位置
+                // 目标角度 = 90度/N
+                const targetAngle = (Math.PI / 2) / numTeeth;
+                // 渐开线当前在分度圆处的角度（atan2(y,x)）
+                // 实际上我们可以简化：半齿厚角度 - invAlpha
+                const angleOffset = targetAngle + invAlpha;
+                
+                // 4. 构建完整的SVG路径
+                let d = "";
+                const anglePerTooth = (2 * Math.PI) / numTeeth;
+
+                for (let i = 0; i < numTeeth; i++) {
+                    const rotation = i * anglePerTooth;
+                    
+                    // --- 左侧齿廓 (镜像) ---
+                    for (let j = stepCount; j >= 0; j--) {
+                        const p = profilePoints[j];
+                        // 镜像：y取反
+                        // 旋转：(-angleOffset) 然后再加上全局旋转 (rotation)
+                        const angle = Math.atan2(-p.y, p.x) + angleOffset + rotation;
+                        const dist = Math.sqrt(p.x*p.x + p.y*p.y);
+                        const px = dist * Math.cos(angle);
+                        const py = dist * Math.sin(angle);
+                        
+                        if (j === stepCount && i === 0) d += `M ${px.toFixed(3)} ${py.toFixed(3)}`;
+                        else d += ` L ${px.toFixed(3)} ${py.toFixed(3)}`;
+                    }
+
+                    // --- 齿根部分 (连接到下一个齿的起始点) ---
+                    // 简单的直线或圆弧连接到下一个齿的起点
+                    // 这里为了简化计算，直接连线。对于Woodgears风格，齿根通常是个U型，
+                    // 但SVG渲染小尺寸时，从基圆连到齿根圆再连回来即可。
+                    // 计算当前齿左侧基圆点
+                    const baseP = profilePoints[0];
+                    const leftBaseAngle = Math.atan2(-baseP.y, baseP.x) + angleOffset + rotation;
+                    
+                    // 下一个齿右侧基圆点
+                    const rightBaseAngle = Math.atan2(baseP.y, baseP.x) - angleOffset + rotation + anglePerTooth;
+                    
+                    // 插入齿根圆上的点 (为了视觉效果，向内收一点)
+                    const rootX1 = rootRadius * Math.cos(leftBaseAngle);
+                    const rootY1 = rootRadius * Math.sin(leftBaseAngle);
+                    const rootX2 = rootRadius * Math.cos(rightBaseAngle);
+                    const rootY2 = rootRadius * Math.sin(rightBaseAngle);
+                    
+                    d += ` L ${rootX1.toFixed(3)} ${rootY1.toFixed(3)}`;
+                    d += ` A ${rootRadius.toFixed(3)} ${rootRadius.toFixed(3)} 0 0 1 ${rootX2.toFixed(3)} ${rootY2.toFixed(3)}`;
+
+                    // --- 右侧齿廓 (正常) ---
+                    for (let j = 0; j <= stepCount; j++) {
+                        const p = profilePoints[j];
+                        // 旋转：(-angleOffset) + rotation + anglePerTooth (下一个齿的位置前移回)
+                        // 实际上是当前齿的右侧： -angleOffset + rotation + anglePerTooth ??? 
+                        // 不，应该是在当前基准线上： angle = atan2(y,x) - angleOffset + rotation + anglePerTooth
+                        // 等等，简单的做法是：
+                        // 左侧是: +angleOffset
+                        // 右侧是: -angleOffset + anglePerTooth ? 不对，那是下一个齿。
+                        // 当前齿右侧: Math.atan2(p.y, p.x) - angleOffset + rotation
+                        const angle = Math.atan2(p.y, p.x) - angleOffset + rotation + anglePerTooth; 
+                        
+                        // 修正逻辑：
+                        // 上面左侧是用镜像(y负) + angleOffset.
+                        // 右侧应该用原点(y正) - angleOffset?
+                        // 让我们重新梳理：
+                        // 齿中心线在 rotation 处。
+                        // 左边面：角度 = rotation + (targetAngle + invAlpha) - inv(r)
+                        // 右边面：角度 = rotation - (targetAngle + invAlpha) + inv(r)
+                        
+                        // 使用之前的逻辑修正：
+                        // 右侧齿廓应该属于"下一个"齿的开始部分，或者当前齿的结束部分。
+                        // 我们的循环结构是：画左面 -> 画齿根 -> 画右面(其实是下一个齿的右面? 不，是当前齿的右面)。
+                        // 修正循环结构： 画一个齿 = 左轮廓(高到低) -> 齿根 -> 右轮廓(低到高) -> 齿顶
+                        
+                        // 重来：
+                        // 1. 右轮廓 (从基圆到齿顶)
+                        // 2. 齿顶圆弧
+                        // 3. 左轮廓 (从齿顶到基圆) - 属于下一个齿？
+                        // 这样比较顺。
+                    }
+                }
+                d += " Z"; // 闭合
+                
+                // 由于上面的循环逻辑稍微复杂，我们采用更直接的点生成法
+                return this.generateSimplePath(numTeeth, outerRadius, holeRadius, rootRadius, baseRadius, profilePoints, angleOffset);
+            }
+
+            generateSimplePath(numTeeth, outerRadius, holeRadius, rootRadius, baseRadius, profilePoints, angleOffset) {
+                let d = "";
+                const anglePerTooth = (2 * Math.PI) / numTeeth;
+                
+                for(let i=0; i<numTeeth; i++) {
+                    const centerAngle = i * anglePerTooth;
+                    
+                    // 1. 右侧面 (Right Flank) - 从基圆往外
+                    // 角度 = centerAngle - angleOffset + inv(r)
+                    // profilePoints 里的点已经包含了 inv(r) 的偏移 (atan2(y,x))
+                    // 所以：angle = centerAngle - angleOffset + atan2(p.y, p.x)
+                    for(let j=0; j<profilePoints.length; j++) {
+                        const p = profilePoints[j];
+                        const r = Math.sqrt(p.x*p.x + p.y*p.y);
+                        const invAngle = Math.atan2(p.y, p.x); 
+                        const theta = centerAngle - angleOffset + invAngle;
+                        
+                        const px = r * Math.cos(theta);
+                        const py = r * Math.sin(theta);
+                        
+                        if (i===0 && j===0) d += `M ${px.toFixed(3)} ${py.toFixed(3)}`;
+                        else d += ` L ${px.toFixed(3)} ${py.toFixed(3)}`;
+                    }
+                    
+                    // 2. 齿顶圆弧 (Top Land)
+                    // 连接到左侧面的顶点
+                    const pTop = profilePoints[profilePoints.length-1];
+                    const rTop = Math.sqrt(pTop.x*pTop.x + pTop.y*pTop.y);
+                    const invAngleTop = Math.atan2(pTop.y, pTop.x);
+                    // 左侧面的角度 = centerAngle + angleOffset - invAngle
+                    // 也就是镜像
+                    const thetaTopLeft = centerAngle + angleOffset - invAngleTop;
+                    const pxTop = rTop * Math.cos(thetaTopLeft);
+                    const pyTop = rTop * Math.sin(thetaTopLeft);
+                    
+                    d += ` A ${rTop.toFixed(3)} ${rTop.toFixed(3)} 0 0 1 ${pxTop.toFixed(3)} ${pyTop.toFixed(3)}`;
+                    
+                    // 3. 左侧面 (Left Flank) - 从外往里
+                    for(let j=profilePoints.length-1; j>=0; j--) {
+                        const p = profilePoints[j];
+                        const r = Math.sqrt(p.x*p.x + p.y*p.y);
+                        const invAngle = Math.atan2(p.y, p.x);
+                        // 镜像：y取反，相当于角度取反
+                        const theta = centerAngle + angleOffset - invAngle;
+                        
+                        const px = r * Math.cos(theta);
+                        const py = r * Math.sin(theta);
+                        
+                        d += ` L ${px.toFixed(3)} ${py.toFixed(3)}`;
+                    }
+                    
+                    // 4. 齿根 (Bottom Land) - 连接到下一个齿的右侧面起点
+                    const nextCenterAngle = (i + 1) * anglePerTooth;
+                    const pBase = profilePoints[0]; // 基圆点
+                    const invAngleBase = Math.atan2(pBase.y, pBase.x);
+                    
+                    // 当前齿结束点(基圆上)
+                    // theta = centerAngle + angleOffset - invAngleBase
+                    
+                    // 下一个齿开始点(基圆上)
+                    const nextThetaStart = nextCenterAngle - angleOffset + invAngleBase;
+                    
+                    // 简单的直线连接(或者向圆心凹陷一点做齿根圆)
+                    const rootX = rootRadius * Math.cos((centerAngle + angleOffset + nextThetaStart)/2); // 中点
+                    const rootY = rootRadius * Math.sin((centerAngle + angleOffset + nextThetaStart)/2);
+                    
+                    const nextPx = baseRadius * Math.cos(nextThetaStart);
+                    const nextPy = baseRadius * Math.sin(nextThetaStart);
+                    
+                    d += ` L ${rootX.toFixed(3)} ${rootY.toFixed(3)}`;
+                    d += ` L ${nextPx.toFixed(3)} ${nextPy.toFixed(3)}`;
+                }
+                
+                d += " Z";
+                
+                // 中心孔
+                d += ` M ${holeRadius} 0`;
+                d += ` A ${holeRadius} ${holeRadius} 0 1 0 ${-holeRadius} 0`;
+                d += ` A ${holeRadius} ${holeRadius} 0 1 0 ${holeRadius} 0 Z`;
+                
+                return d;
+            }
+            
+            generateSVG(teeth, size = 100) {
+                // 半径稍小于视口的一半以留边距
+                const outerRadius = (size / 2) * 0.95;
+                const holeRadius = outerRadius * 0.25;
+                const pathData = this.generatePath(teeth, outerRadius, holeRadius);
+                
+                return `<svg viewBox="-${size/2} -${size/2} ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+                    <path d="${pathData}" fill-rule="evenodd"/>
+                </svg>`;
+            }
+        }
+
+        // ===== 创建齿轮并添加到页面 =====
+        function createGears() {
+            const gearSystem = document.getElementById('gear-system');
+            const loaderGear = document.getElementById('loader-gear');
+            const generator = new InvoluteGearGenerator();
+            
+            // 齿轮配置：位置class, 齿数
+            const gearConfigs = [
+                { class: 'gear-1', teeth: 32 },
+                { class: 'gear-2', teeth: 32 },
+                { class: 'gear-3', teeth: 32 },
+                { class: 'gear-4', teeth: 32 },
+                { class: 'gear-5', teeth: 24 },
+                { class: 'gear-6', teeth: 24 },
+                { class: 'gear-7', teeth: 16 },
+                { class: 'gear-8', teeth: 16 },
+                { class: 'gear-9', teeth: 12 },
+                { class: 'gear-10', teeth: 12 },
+                { class: 'gear-11', teeth: 12 },
+                { class: 'gear-12', teeth: 12 }
+            ];
+
+            // 生成背景装饰齿轮
+            gearConfigs.forEach(config => {
+                const svg = generator.generateSVG(config.teeth, 100);
+                const gearDiv = document.createElement('div');
+                gearDiv.className = `gear ${config.class}`;
+                gearDiv.innerHTML = svg;
+                gearSystem.appendChild(gearDiv);
+            });
+
+            // 生成Loading齿轮
+            // 手动生成path放入现有svg
+            const loaderPath = generator.generatePath(16, 45, 12); // radius 45 to fit in 100x100 viewbox (center 0,0)
+            // loader-gear的viewBox是0 0 100 100，所以需要平移50,50
+            loaderGear.innerHTML = `<g transform="translate(50, 50)"><path d="${loaderPath}" fill-rule="evenodd"/></g>`;
+        }
+
+        // ===== 全局变量 =====
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetX = mouseX;
+        let targetY = mouseY;
+        let trailParticles = [];
+        const maxTrails = 20;
+
+        // ===== 高级光标系统 =====
+        const cursorMain = document.querySelector('.cursor-main');
+        const cursorCenter = document.querySelector('.cursor-center');
+        const trailsContainer = document.getElementById('cursor-trails');
+
+        function updateCursor(e) {
+            targetX = e.clientX;
+            targetY = e.clientY;
+            createTrailParticle(e.clientX, e.clientY);
+        }
+
+        function createTrailParticle(x, y) {
+            if (trailParticles.length >= maxTrails) {
+                const oldest = trailParticles.shift();
+                oldest.element.remove();
+            }
+
+            const particle = document.createElement('div');
+            particle.className = 'cursor-trail';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.opacity = '0.6';
+            particle.style.transform = 'translate(-50%, -50%) scale(1)';
+            trailsContainer.appendChild(particle);
+
+            trailParticles.push({
+                element: particle,
+                life: 1,
+                decay: 0.03
+            });
+        }
+
+        function animateCursor() {
+            mouseX += (targetX - mouseX) * 0.15;
+            mouseY += (targetY - mouseY) * 0.15;
+
+            if (cursorMain && cursorCenter) {
+                cursorMain.style.left = mouseX + 'px';
+                cursorMain.style.top = mouseY + 'px';
+                cursorCenter.style.left = targetX + 'px';
+                cursorCenter.style.top = targetY + 'px';
+            }
+
+            trailParticles.forEach((p, index) => {
+                p.life -= p.decay;
+                if (p.life <= 0) {
+                    p.element.remove();
+                    trailParticles.splice(index, 1);
+                } else {
+                    p.element.style.opacity = p.life * 0.5;
+                    p.element.style.transform = `translate(-50%, -50%) scale(${p.life})`;
+                }
+            });
+
+            requestAnimationFrame(animateCursor);
+        }
+
+        // ===== 光晕跟随 =====
+        const ambientGlow = document.querySelector('.ambient-glow');
+
+        function updateGlow() {
+            if (ambientGlow) {
+                ambientGlow.style.left = (mouseX - 250) + 'px';
+                ambientGlow.style.top = (mouseY - 250) + 'px';
+            }
+        }
+
+        // ===== 粒子系统 =====
+        class ParticleSystem {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.resize();
+                this.init();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            init() {
+                const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 15000);
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 2 + 0.5,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
+                        opacity: Math.random() * 0.5 + 0.2,
+                        pulse: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            update() {
+                this.particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.pulse += 0.02;
+
+                    // 鼠标引力
+                    const dx = mouseX - p.x;
+                    const dy = mouseY - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        p.x += dx * 0.01;
+                        p.y += dy * 0.01;
+                    }
+
+                    // 边界处理
+                    if (p.x < 0) p.x = this.canvas.width;
+                    if (p.x > this.canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = this.canvas.height;
+                    if (p.y > this.canvas.height) p.y = 0;
+                });
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                const style = getComputedStyle(document.documentElement);
+                const particleColor = style.getPropertyValue('--particle-color').trim();
+
+                this.particles.forEach(p => {
+                    const pulseOpacity = p.opacity * (0.7 + Math.sin(p.pulse) * 0.3);
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = particleColor.replace('0.6', pulseOpacity.toString());
+                    this.ctx.fill();
+                });
+
+                // 连接线
+                this.particles.forEach((p1, i) => {
+                    this.particles.slice(i + 1).forEach(p2 => {
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.strokeStyle = particleColor.replace('0.6', (0.15 * (1 - dist / 100)).toString());
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+            }
+
+            animate() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        // ===== 加载动画 =====
+        function simulateLoading() {
+            const progressBar = document.querySelector('.loader-progress-bar');
+            const loaderMask = document.querySelector('.loader-mask');
+            const mainContainer = document.querySelector('.main-container');
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loaderMask.style.opacity = '0';
+                        loaderMask.style.pointerEvents = 'none';
+                        setTimeout(() => {
+                            loaderMask.style.display = 'none';
+                            mainContainer.classList.add('loaded');
+                            startEntranceAnimations();
+                        }, 500);
+                    }, 300);
+                }
+                progressBar.style.width = progress + '%';
+            }, 150);
+        }
+
+        // ===== 入场动画 =====
+        function startEntranceAnimations() {
+            const timeline = [
+                { el: '.gear', delay: 0, style: 'opacity', value: '1' },
+                { el: '.deco-line', delay: 200, style: 'opacity', value: '1' },
+                { el: '.corner-ornament', delay: 400, style: 'opacity', value: '1' },
+                { el: '.logo-section', delay: 500, transform: true },
+                { el: '.title-section', delay: 700, transform: true },
+                { el: '.divider', delay: 900, style: 'opacity', value: '1' },
+                { el: '.description', delay: 1000, transform: true },
+                { el: '.enter-section', delay: 1100, transform: true },
+                { el: '.footer-info', delay: 1300, style: 'opacity', value: '1' }
+            ];
+
+            timeline.forEach(item => {
+                setTimeout(() => {
+                    const elements = document.querySelectorAll(item.el);
+                    elements.forEach(el => {
+                        if (item.transform) {
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0)';
+                        } else {
+                            el.style[item.style] = item.value;
+                        }
+                    });
+                }, item.delay);
+            });
+
+            setTimeout(() => {
+                const letters = document.querySelectorAll('.letter');
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        letter.style.opacity = '1';
+                        letter.style.transform = 'translateY(0)';
+                    }, index * 70);
+                });
+            }, 800);
+        }
+
+        // ===== 页面跳转动画 =====
+        function navigateToSite(e) {
+            e.preventDefault();
+            const exitOverlay = document.querySelector('.exit-overlay');
+            const targetUrl = e.currentTarget.getAttribute('href');
+
+            exitOverlay.classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 800);
+        }
+
+        // ===== 悬停效果 =====
+        function addHoverEffects() {
+            const hoverElements = document.querySelectorAll('a, button, .logo-frame');
+            hoverElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorMain.classList.add('hover');
+                    cursorCenter.classList.add('hover');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorMain.classList.remove('hover');
+                    cursorCenter.classList.remove('hover');
+                });
+            });
+        }
+
+        // ===== 初始化 =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // 生成齿轮
+            createGears();
+
+            // 光标
+            document.addEventListener('mousemove', (e) => {
+                updateCursor(e);
+                updateGlow();
+            });
+            animateCursor();
+
+            // 粒子系统
+            const canvas = document.getElementById('particles-canvas');
+            const particleSystem = new ParticleSystem(canvas);
+            particleSystem.animate();
+
+            window.addEventListener('resize', () => {
+                particleSystem.resize();
+            });
+
+            // 进入按钮
+            document.getElementById('enter-btn').addEventListener('click', navigateToSite);
+
+            // 加载
+            simulateLoading();
+            setTimeout(addHoverEffects, 2000);
+
+            // 过渡样式
+            document.querySelectorAll('.logo-section, .title-section, .description, .enter-section').forEach(el => {
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            });
+
+            document.querySelectorAll('.letter').forEach(el => {
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            });
+        });
+    </script>
+</body>
+</html>
