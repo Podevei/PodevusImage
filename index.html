@@ -695,6 +695,90 @@
         }
         @keyframes ripple-effect { to { transform: scale(4); opacity: 0; } }
 
+        /* ===== 博客跳转丝滑过渡系统 ===== */
+        .blog-transition-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100005;
+            pointer-events: none; /* 初始状态不遮挡点击 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 以点击点为中心扩散的底色圆圈 */
+        .blog-transition-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: #faf8f3; /* 目标站亮色背景 */
+            transform: scale(0);
+            transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .blog-transition-circle {
+                background: #1a1816; /* 目标站深色背景 */
+            }
+        }
+
+        /* 浮现的目标网站预告内容 (标题、副标题) */
+        .blog-transition-content {
+            position: relative;
+            z-index: 100006;
+            opacity: 0;
+            text-align: center;
+            transition: opacity 0.8s ease 0.5s;
+        }
+
+        .blog-transition-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #c89b6d; /* 目标站主色 */
+            margin-bottom: 15px;
+            letter-spacing: 0.05em;
+        }
+
+        .blog-transition-subtitle {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            font-size: 1.2rem;
+            color: #5a504a;
+            letter-spacing: 0.3em;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .blog-transition-title { color: #d4a574; }
+            .blog-transition-subtitle { color: #c4bfb8; }
+        }
+
+        /* 预告目标网站的边角十字装饰 */
+        .blog-transition-corner {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.7s; /* 跟随扩散圆稍后浮现 */
+            z-index: 100006;
+        }
+
+        .blog-transition-corner svg {
+            width: 100%; height: 100%;
+            fill: none;
+            stroke: #c89b6d;
+            stroke-width: 1.5;
+        }
+        .blog-transition-corner svg circle { fill: #c89b6d; }
+
+        @media (prefers-color-scheme: dark) {
+            .blog-transition-corner svg { stroke: #d4a574; }
+            .blog-transition-corner svg circle { fill: #d4a574; }
+        }
+
+        .bt-tl { top: 10px; left: 10px; }
+        .bt-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+        .bt-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+        .bt-br { bottom: 10px; right: 10px; transform: scale(-1); }
+
         /* ===== 响应式 ===== */
         @media (max-width: 768px) {
             .corner-ornament { width: 70px; height: 70px; }
@@ -772,6 +856,26 @@
         <div class="fractal-layer" id="fractal-layer"></div>
         <div class="light-beam-layer" id="light-beam-layer"></div>
         <div class="final-fade-layer"></div>
+    </div>
+
+    <div class="blog-transition-overlay" id="blog-transition-overlay">
+        <div class="blog-transition-circle" id="blog-transition-circle"></div>
+        <div class="blog-transition-corner bt-tl">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg>
+        </div>
+        <div class="blog-transition-corner bt-tr">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg>
+        </div>
+        <div class="blog-transition-corner bt-bl">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg>
+        </div>
+        <div class="blog-transition-corner bt-br">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg>
+        </div>
+        <div class="blog-transition-content" id="blog-transition-content">
+            <div class="blog-transition-title">Podevus</div>
+            <div class="blog-transition-subtitle">記 · 思 · 道</div>
+        </div>
     </div>
 
     <div class="main-container">
@@ -858,7 +962,7 @@
             </div>
 
             <div class="description">
-                <p>在时光与机械的交织中,记录思绪的流转。<br>技术、文学、幻想与游戏,皆是浪漫的注脚。</p>
+                <p>Raymond Podevei's Mirror Site Gateway<br></p>
             </div>
 
             <div class="enter-section">
@@ -896,9 +1000,9 @@
                 <div class="m3-image-card">
                     <div class="m3-card-inner">
                         <div class="m3-image-wrapper">
-                            <img src="https://via.placeholder.com/600x800/1A1512/C9A962?text=Taisho+Elegance" alt="Placeholder Image" class="m3-img">
+                            <img src="blog.png" alt="Blog Image" class="m3-img" style="width: 200px; height: auto; position: absolute; margin: auto; top: 0; bottom: 0; left: 0; right: 0;">
                             <div class="m3-surface-overlay">
-                                <a href="https://podevei.github.io/Podevus/" class="m3-fab ripple-trigger">
+                                <a href="https://podevei.github.io/Podevus/" class="m3-fab ripple-trigger blog-link-btn">
                                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                                         <path fill="currentColor" d="M50 0 L100 50 L50 100 L0 50 Z M50 15 L85 50 L50 85 L15 50 Z" />
                                         <path fill="currentColor" d="M15 50 L50 15 L85 50 L50 85 Z M25 50 L50 25 L75 50 L50 75 Z" />
@@ -1001,6 +1105,7 @@
                         const p = profilePoints[j];
                         const r = Math.sqrt(p.x*p.x + p.y*p.y);
                         const invAngle = Math.atan2(p.y, p.x);
+
                         const theta = centerAngle + angleOffset - invAngle;
                         const px = r * Math.cos(theta);
                         const py = r * Math.sin(theta);
@@ -1251,11 +1356,9 @@
             }, 800);
         }
 
-        // ===== 画廊展开动画系统 (替代原跳转逻辑) =====
+        // ===== 主画廊展开动画系统 =====
         function createExitTransition() {
             const generator = new InvoluteGearGenerator();
-            
-            // 已删除 hex-grid-layer 逻辑，修复卡加载的问题
             
             const gearBurstLayer = document.getElementById('gear-burst-layer');
             const gearCounts = [6, 8, 10, 12];
@@ -1373,6 +1476,54 @@
             }, 800);
         }
 
+        // ===== 博客无缝平滑跳转功能 =====
+        function transitionToBlog(e) {
+            e.preventDefault();
+            const targetUrl = this.getAttribute('href') || 'https://podevei.github.io/Podevus/';
+            
+            const overlay = document.getElementById('blog-transition-overlay');
+            const circle = document.getElementById('blog-transition-circle');
+            const content = document.getElementById('blog-transition-content');
+            const corners = document.querySelectorAll('.blog-transition-corner');
+            
+            // 获取点击的鼠标位置作为圆的扩散中心
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX || (rect.left + rect.width / 2);
+            const y = e.clientY || (rect.top + rect.height / 2);
+            
+            // 计算需要的最大扩散半径（对角线），确保覆盖全屏
+            const maxDim = Math.max(window.innerWidth, window.innerHeight);
+            const radius = maxDim * 1.5; 
+            
+            circle.style.width = radius * 2 + 'px';
+            circle.style.height = radius * 2 + 'px';
+            circle.style.left = (x - radius) + 'px';
+            circle.style.top = (y - radius) + 'px';
+            
+            // 允许遮罩层捕获事件，屏蔽原页面的交互
+            overlay.style.pointerEvents = 'all';
+            
+            // 启动纯色圆环爆发扩展
+            setTimeout(() => {
+                circle.style.transform = 'scale(1)';
+                
+                // 平滑淡出现有的画廊和背景元素，防止透底
+                document.querySelector('.m3-gallery-container').style.transition = 'opacity 0.6s ease';
+                document.querySelector('.m3-gallery-container').style.opacity = '0';
+                document.querySelector('.main-container').style.transition = 'opacity 0.6s ease';
+                document.querySelector('.main-container').style.opacity = '0';
+                
+                // 圆环覆盖后，平滑浮现预告 UI（十字边角和中心文字）
+                content.style.opacity = '1';
+                corners.forEach(c => c.style.opacity = '1');
+                
+                // 等待视觉过渡完成（约 2.2 秒），然后在后台正式跳转链接
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 2200);
+            }, 50);
+        }
+
         // ===== 悬停效果 =====
         function addHoverEffects() {
             const hoverElements = document.querySelectorAll('a, button, .logo-frame, .m3-image-card');
@@ -1407,8 +1558,14 @@
                 particleSystem.resize();
             });
 
-            // 绑定新的打开画廊事件
+            // 绑定打开画廊事件
             document.getElementById('enter-btn').addEventListener('click', openGallery);
+            
+            // 绑定博客无缝跳转事件
+            const blogBtn = document.querySelector('.blog-link-btn');
+            if (blogBtn) {
+                blogBtn.addEventListener('click', transitionToBlog);
+            }
 
             simulateLoading();
             setTimeout(addHoverEffects, 2000);
